@@ -8,6 +8,7 @@ use convergence::protocol_ext::DataRowBatch;
 use datafusion::error::DataFusionError;
 use datafusion::prelude::*;
 use sqlparser::ast::Statement;
+use std::ops::Deref;
 use std::sync::Arc;
 
 fn df_err_to_sql(err: DataFusionError) -> ErrorResponse {
@@ -22,7 +23,7 @@ pub struct DataFusionPortal {
 #[async_trait]
 impl Portal for DataFusionPortal {
 	async fn fetch(&mut self, batch: &mut DataRowBatch) -> Result<(), ErrorResponse> {
-		for arrow_batch in self.df.collect().await.map_err(df_err_to_sql)? {
+		for arrow_batch in self.df.deref().clone().collect().await.map_err(df_err_to_sql)? {
 			record_batch_to_rows(&arrow_batch, batch)?;
 		}
 		Ok(())
@@ -52,6 +53,6 @@ impl Engine for DataFusionEngine {
 
 	async fn create_portal(&mut self, statement: &Statement) -> Result<Self::PortalType, ErrorResponse> {
 		let df = self.ctx.sql(&statement.to_string()).await.map_err(df_err_to_sql)?;
-		Ok(DataFusionPortal { df })
+		Ok(DataFusionPortal { df: df.into() })
 	}
 }
