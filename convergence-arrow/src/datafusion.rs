@@ -1,5 +1,6 @@
 //! Provides a DataFusion-powered implementation of the [Engine] trait.
 
+use std::ops::Deref;
 use crate::table::{record_batch_to_rows, schema_to_field_desc};
 use async_trait::async_trait;
 use convergence::engine::{Engine, Portal};
@@ -22,7 +23,7 @@ pub struct DataFusionPortal {
 #[async_trait]
 impl Portal for DataFusionPortal {
 	async fn fetch(&mut self, batch: &mut DataRowBatch) -> Result<(), ErrorResponse> {
-		for arrow_batch in self.df.collect().await.map_err(df_err_to_sql)? {
+		for arrow_batch in self.df.deref().clone().collect().await.map_err(df_err_to_sql)? {
 			record_batch_to_rows(&arrow_batch, batch)?;
 		}
 		Ok(())
@@ -52,6 +53,6 @@ impl Engine for DataFusionEngine {
 
 	async fn create_portal(&mut self, statement: &Statement) -> Result<Self::PortalType, ErrorResponse> {
 		let df = self.ctx.sql(&statement.to_string()).await.map_err(df_err_to_sql)?;
-		Ok(DataFusionPortal { df })
+		Ok(DataFusionPortal { df: df.into() })
 	}
 }
