@@ -34,6 +34,7 @@ fn dummy_query() -> Statement {
 			having: None,
 			lateral_views: vec![],
 			named_window: vec![],
+			value_table_mode: None,
 		}))),
 		locks: vec![],
 		limit: None,
