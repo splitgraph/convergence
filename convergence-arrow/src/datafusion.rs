@@ -25,11 +25,12 @@ fn dummy_query() -> Statement {
 			)))],
 			top: None,
 			sort_by: vec![],
+			prewhere: None,
 			selection: None,
 			cluster_by: vec![],
 			distinct: None,
 			distribute_by: vec![],
-			group_by: GroupByExpr::Expressions(vec![]),
+			group_by: GroupByExpr::Expressions(vec![], vec![]),
 			from: vec![],
 			having: None,
 			lateral_views: vec![],
@@ -43,9 +44,11 @@ fn dummy_query() -> Statement {
 		with: None,
 		fetch: None,
 		offset: None,
-		order_by: vec![],
+		order_by: None,
 		for_clause: None,
 		limit_by: vec![],
+		settings: None,
+		format_clause: None,
 	}))
 }
 
