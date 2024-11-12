@@ -3,8 +3,8 @@
 use datafusion::arrow::array::{ArrayRef, Int32Builder, StringBuilder, UInt32Builder};
 use datafusion::arrow::datatypes::{Field, Schema};
 use datafusion::arrow::record_batch::RecordBatch;
+use datafusion::catalog::{CatalogProvider, SchemaProvider};
 use datafusion::catalog_common::memory::MemorySchemaProvider;
-use datafusion::catalog::{SchemaProvider, CatalogProvider};
 use datafusion::datasource::{MemTable, TableProvider};
 use datafusion::error::DataFusionError;
 use std::convert::TryInto;
@@ -153,6 +153,7 @@ impl MetadataBuilder {
 }
 
 /// Wrapper catalog supporting generation of pg metadata (e.g. pg_catalog schema).
+#[derive(Debug)]
 pub struct Catalog {
 	wrapped: Arc<dyn CatalogProvider>,
 }
